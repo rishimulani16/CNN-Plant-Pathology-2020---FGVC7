@@ -159,8 +159,43 @@ def login():
         return jsonify({'message': f'Login failed: {str(e)}'}), 500
 
 @app.route('/predict', methods=['POST'])
+def predict_leaf_json():
+    """Predict endpoint that accepts JSON with base64 image data"""
+    try:
+        data = request.get_json()
+        if not data or 'image' not in data:
+            print('No image data provided')
+            return jsonify({'message': 'No image data provided'}), 400
+        # Decode base64 image
+        try:
+            image_data = base64.b64decode(data['image'])
+            image = Image.open(io.BytesIO(image_data))
+        except Exception as e:
+            print(f'Invalid image data: {str(e)}')
+            return jsonify({'message': f'Invalid image data: {str(e)}'}), 400
+        # Convert to RGB if necessary
+        if image.mode != 'RGB':
+            image = image.convert('RGB')
+        # Get prediction from ML model
+        try:
+            result = model_predictor.predict_leaf(image)
+        except Exception as e:
+            print(f'Prediction error: {str(e)}')
+            return jsonify({'message': f'Prediction error: {str(e)}'}), 500
+        
+        # Return only the disease class (no confidence scores)
+        return jsonify({
+            'predicted_class': result,
+            'timestamp': datetime.utcnow().isoformat()
+        }), 200
+    except Exception as e:
+        print(f'Prediction failed: {str(e)}')
+        return jsonify({'message': f'Prediction failed: {str(e)}'}), 500
+
+@app.route('/predict-upload', methods=['POST'])
 @token_required
-def predict_leaf(current_user_id):
+def predict_leaf_upload(current_user_id):
+    """Original predict endpoint for file uploads with authentication"""
     try:
         if 'image' not in request.files:
             return jsonify({'message': 'No image file provided'}), 400
@@ -181,11 +216,13 @@ def predict_leaf(current_user_id):
             image = image.convert('RGB')
         
         # Get prediction from ML model
-        result, confidence = model_predictor.predict_leaf(image)
+        result, confidence, all_predictions = model_predictor.predict_leaf(image)
         
         return jsonify({
             'result': result,
-            'confidence': float(confidence)
+            'confidence': float(confidence),
+            'all_predictions': all_predictions,
+            'timestamp': datetime.utcnow().isoformat()
         }), 200
         
     except Exception as e:
@@ -195,6 +232,15 @@ def predict_leaf(current_user_id):
 def health_check():
     return jsonify({'status': 'healthy', 'model_loaded': model_predictor.is_loaded()}), 200
 
+@app.route('/model/status', methods=['GET'])
+def model_status():
+    """Get detailed model information"""
+    try:
+        model_info = model_predictor.get_model_info()
+        return jsonify(model_info), 200
+    except Exception as e:
+        return jsonify({'loaded': False, 'error': str(e)}), 500
+
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=8080)

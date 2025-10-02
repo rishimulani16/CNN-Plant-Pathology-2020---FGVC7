@@ -22,6 +22,7 @@ import {
   Upload,
 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
+import { api } from "@/lib/api"
 import ImageUpload from "@/components/image-upload"
 import PredictionResultComponent from "@/components/prediction-result"
 import SummaryDashboard from "@/components/summary-dashboard"
@@ -43,8 +44,6 @@ export default function Dashboard() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [error, setError] = useState("")
   const [activeTab, setActiveTab] = useState("analyze")
-
-  const isDevelopment = process.env.NODE_ENV === "development"
 
   const handleImageSelect = (file: File) => {
     setSelectedImage(file)
@@ -72,16 +71,12 @@ export default function Dashboard() {
 
       console.log("[v0] Starting image analysis...")
 
-      const response = {
-        result: "Healthy Leaf",
-        confidence: 0.92,
-        imageUrl: imagePreview!,
-      }
+      const response = await api.predict(selectedImage, "")
 
       console.log("[v0] Analysis response:", response)
 
       const result: PredictionResult = {
-        result: response.result,
+        result: response.predicted_class || response.result,
         confidence: response.confidence,
         timestamp: new Date().toISOString(),
         imageUrl: imagePreview!,
@@ -125,9 +120,6 @@ export default function Dashboard() {
               <Leaf className="w-5 h-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold text-foreground">LeafGuard AI</span>
-            {isDevelopment && (
-              <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full ml-2">Demo Mode</span>
-            )}
           </div>
 
           <div className="flex items-center gap-4">
@@ -152,14 +144,6 @@ export default function Dashboard() {
           <p className="text-muted-foreground">
             Upload an apple leaf image to detect potential diseases using our AI model.
           </p>
-          {isDevelopment && (
-            <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
-                <strong>Demo Mode:</strong> You're using mock predictions for development. The AI analysis will return
-                sample results.
-              </p>
-            </div>
-          )}
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">

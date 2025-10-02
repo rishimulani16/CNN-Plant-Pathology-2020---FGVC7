@@ -1,0 +1,45 @@
+Loading your trained model from /Users/rishi/Documents/plant1/backend/models/my_model.keras...
+✅ Successfully loaded your model!
+Model input shape: (None, 224, 224, 3)
+Model output shape: (None, 4)
+Total parameters: 2,422,468
+Updated input size to: (224, 224)
+Attempting to load complete model from /Users/rishi/Documents/plant1/backend/models/my_model.keras...
+Successfully loaded complete model from /Users/rishi/Documents/plant1/backend/models/my_model.keras
+Model input shape: (None, 224, 224, 3)
+Model output shape: (None, 4)
+Updated input size to: (224, 224)
+ * Serving Flask app 'app'
+ * Debug mode: on
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:8080
+ * Running on http://10.102.47.102:8080
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 127-869-521
+127.0.0.1 - - [24/Sep/2025 01:20:25] "GET /model/status HTTP/1.1" 200 -
+2025-09-24 01:20:41.554547: I external/local_xla/xla/service/service.cc:163] XLA service 0x128951850 initialized for platform Host (this does not guarantee that XLA will be used). Devices:
+2025-09-24 01:20:41.554608: I external/local_xla/xla/service/service.cc:171]   StreamExecutor device (0): Host, Default Version
+2025-09-24 01:20:41.581219: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1758657042.016801 3188973 device_compiler.h:196] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+/Users/rishi/Documents/plant1/backend/app.py:194: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  'timestamp': datetime.utcnow().isoformat()
+127.0.0.1 - - [24/Sep/2025 01:20:42] "POST /predict HTTP/1.1" 200 -
+ * Detected change in '/Users/rishi/Documents/plant1/backend/app.py', reloading
+Loading your trained model from /Users/rishi/Documents/plant1/backend/models/my_model.keras...
+✅ Successfully loaded your model!
+Model input shape: (None, 224, 224, 3)
+Model output shape: (None, 4)
+Total parameters: 2,422,468
+Updated input size to: (224, 224)
+Attempting to load complete model from /Users/rishi/Documents/plant1/backend/models/my_model.keras...
+Successfully loaded complete model from /Users/rishi/Documents/plant1/backend/models/my_model.keras
+Model input shape: (None, 224, 224, 3)
+Model output shape: (None, 4)
+Updated input size to: (224, 224)
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 127-869-521

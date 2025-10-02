@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
 
 export class ApiError extends Error {
   constructor(
@@ -51,49 +51,6 @@ const handleResponse = async (response: Response) => {
 }
 
 const isDevelopment = process.env.NODE_ENV === "development"
-const useMockAPI = isDevelopment && !process.env.NEXT_PUBLIC_API_URL
-
-const mockDelay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
-const mockApi = {
-  async signup(email: string, password: string, name: string) {
-    await mockDelay(1000)
-    return {
-      token: "mock-jwt-token-" + Date.now(),
-      user: { id: "1", name, email },
-    }
-  },
-
-  async login(email: string, password: string) {
-    await mockDelay(800)
-    if (email === "demo@example.com" && password === "demo123") {
-      return {
-        token: "mock-jwt-token-" + Date.now(),
-        user: { id: "1", name: "Demo User", email },
-      }
-    }
-    throw new ApiError(401, "Invalid credentials. Try demo@example.com / demo123")
-  },
-
-  async predict(imageFile: File, token: string) {
-    await mockDelay(2000)
-
-    // Mock prediction results
-    const diseases = [
-      { name: "Healthy", confidence: 0.92 },
-      { name: "Apple Scab", confidence: 0.87 },
-      { name: "Apple Rust", confidence: 0.79 },
-      { name: "Multiple Diseases", confidence: 0.65 },
-    ]
-
-    const randomDisease = diseases[Math.floor(Math.random() * diseases.length)]
-
-    return {
-      result: randomDisease.name,
-      confidence: randomDisease.confidence,
-    }
-  },
-}
 
 const makeRequest = async (url: string, options: RequestInit) => {
   try {
@@ -120,10 +77,6 @@ const makeRequest = async (url: string, options: RequestInit) => {
 
 export const api = {
   async signup(email: string, password: string, name: string) {
-    if (useMockAPI) {
-      console.log("[v0] Using mock API for signup")
-      return mockApi.signup(email, password, name)
-    }
     return makeRequest(`${API_BASE_URL}/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -132,10 +85,6 @@ export const api = {
   },
 
   async login(email: string, password: string) {
-    if (useMockAPI) {
-      console.log("[v0] Using mock API for login")
-      return mockApi.login(email, password)
-    }
     return makeRequest(`${API_BASE_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -144,11 +93,6 @@ export const api = {
   },
 
   async predict(imageFile: File, token: string) {
-    if (useMockAPI) {
-      console.log("[v0] Using mock API for prediction")
-      return mockApi.predict(imageFile, token)
-    }
-
     const formData = new FormData()
     formData.append("image", imageFile)
 
